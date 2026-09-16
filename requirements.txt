@@ -11,3 +11,4 @@ torch
 jupyter
 ipykernel
 ipywidgets
+readchar

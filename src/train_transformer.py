@@ -6,10 +6,15 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 from torch.utils.data import Dataset
 
+# for a better ui 
+import time
+import subprocess
+import readchar 
 
+######### READING THE CSV FILES #########
 
 print("\n" + "=" * 50)
-print("DATA LOAD")
+print("MEDINTAKE — BERT DATASET")
 print("=" * 50)
 
 # train/test load
@@ -17,6 +22,8 @@ print("\nLoading the train/test data from clinical_cases public dataset ...")
 df_train = pd.read_csv("datasets/clinical_cases_train.csv")
 df_test = pd.read_csv("datasets/clinical_cases_test.csv")
 
+# using sleep() to hault the code execution
+time.sleep(6)
 print("\nUpload completed succesfully.")
 
 # shape of dfs
@@ -25,19 +32,35 @@ print(f"The shape of test dataframe is: {df_test.shape}")
 
 
 
-###### TOKENIZATION #########
+########################################
+
+print("\nPress any key to continue ...")
+readchar.readkey()
+
+# clearing the screen
+subprocess.run(["clear"])
+
+
+
+
+###### TOKENIZATION PHASE #########
 
 print("\n" + "=" * 50)
+print("MEDINTAKE — BERT DATASET")
+print("=" * 50)
+
 print("\nStarting tokenization process ...\n")
 # tokenizer chosen automatically for BERT
 tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 
+time.sleep(6)
+
 # listing the dfs to make them compatible with the tokenizer 
 X_train = df_train["medical_abstract"].tolist()
-y_train = df_train["condition_label"].tolist()
+y_train = [label - 1 for label in df_train["condition_label"].tolist()]
 
 X_test = df_test["medical_abstract"].tolist()
-y_test = df_test["condition_label"].tolist()
+y_test = [label - 1 for label in df_test["condition_label"].tolist()]
 
 # tokenization of the entire dataset
 train_encodings = tokenizer(
@@ -52,16 +75,21 @@ test_encodings = tokenizer(     # same goes here...
     padding=True
 )
 
+
+
 # let's check what we obtained
 print("\nType of the encoding created by the tokenizer: ")
 print(type(train_encodings))    # type of the encoding created by the tokenizer
 
+
 print("\nFirst BERT token IDs (101 = [CLS] / 102 = [SEP]): ")
 print(train_encodings["input_ids"][0][:20])     # BERT token IDs where 101 is [CLS]
+
 
 print("\nAttention mask for each token showed above (1 = real token / 0 = padding): ")
 print(train_encodings["attention_mask"][0][:20])    # mask shows how there is no padding yet
 # print(train_encodings.keys()) shows all the masks 
+
 
 
 # creating a class for better gestion 
@@ -88,30 +116,23 @@ print(MedicalDataset)
 
 print("\n" + "=" * 50)
 
+
 # asigning with MedicalDataset call
 train_dataset = MedicalDataset(train_encodings, y_train)
 test_dataset = MedicalDataset(test_encodings, y_test)
 
-# lenght of train dataset after tokenization and class call
-lenght_train_df = len(train_dataset)
-print(f"\nLenght of train dataset: {lenght_train_df}")  
 
+#########################
 
-############ 
-import time
-import subprocess
+print("\nPress any key to continue ...")
+readchar.readkey()
 
-print("\n" + "=" * 50)
-# printing the start time
-print("\nThe time of code execution begin is : ", time.ctime())
-
-# using sleep() to hault the code execution
-time.sleep(6)
-
-# Clearing the Screen
+# clearing the screen
 subprocess.run(["clear"])
 
-######## OVERVIEW #########
+
+
+########### OVERVIEW ############
 
 print("\n" + "=" * 50)
 print("MEDINTAKE — BERT DATASET")
@@ -121,6 +142,8 @@ print(f"Training samples : {len(train_dataset)}")
 print(f"Test samples     : {len(test_dataset)}")
 print("Labels           : 5")
 print("Model            : bert-base-uncased")
+
+time.sleep(6)
 
 sample = train_dataset[0]
 
@@ -138,6 +161,58 @@ print("\nTokens:")
 print(" ".join(real_tokens[:400]))
 
 print("=" * 50)
+
+
+#########################################
+
+print("\nPress any key to continue ...")
+readchar.readkey()
+
+# clearing the screen
+subprocess.run(["clear"])
+
+
+
+
+
+########## DATALOAD INTO BERT ###########
+print("\n" + "=" * 50)
+print("MEDINTAKE — BERT DATASET")
+print("=" * 50)
+
+from torch.utils.data import DataLoader
+
+train_loader = DataLoader(
+    train_dataset,
+    batch_size=8,   # 8 cases each batch
+    shuffle=True    # all the cases are mixed during the training process 
+)
+
+test_loader = DataLoader(
+    test_dataset,   
+    batch_size=8
+)   # not essential to shuffle on test 
+
+
+batch = next(iter(train_loader))
+
+print("\nDATALOADER")
+
+
+print(f"Batch size       : {batch['input_ids'].shape[0]}")
+print(f"Input shape      : {batch['input_ids'].shape}")
+print(f"Attention shape  : {batch['attention_mask'].shape}")
+print(f"Labels shape     : {batch['labels'].shape}")
+print(f"Labels           : {batch['labels'].tolist()}")
+
+
+#########################################
+
+print("\nPress any key to continue ...")
+readchar.readkey()
+
+# clearing the screen
+subprocess.run(["clear"])
 
 
 
