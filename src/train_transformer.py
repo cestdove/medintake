@@ -1,3 +1,5 @@
+####### USEFUL IMPORT #######
+
 # useful libs
 import pandas as pd
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
@@ -10,6 +12,12 @@ from torch.utils.data import Dataset
 import time
 import subprocess
 import readchar 
+
+##############################
+
+
+
+
 
 ######### READING THE CSV FILES #########
 
@@ -30,8 +38,6 @@ print("\nUpload completed succesfully.")
 print(f"\nThe shape of train dataframe is: {df_train.shape}\n")
 print(f"The shape of test dataframe is: {df_test.shape}")
 
-
-
 ########################################
 
 print("\nPress any key to continue ...")
@@ -39,6 +45,10 @@ readchar.readkey()
 
 # clearing the screen
 subprocess.run(["clear"])
+
+########################################
+
+
 
 
 
@@ -76,7 +86,6 @@ test_encodings = tokenizer(     # same goes here...
 )
 
 
-
 # let's check what we obtained
 print("\nType of the encoding created by the tokenizer: ")
 print(type(train_encodings))    # type of the encoding created by the tokenizer
@@ -90,7 +99,7 @@ print("\nAttention mask for each token showed above (1 = real token / 0 = paddin
 print(train_encodings["attention_mask"][0][:20])    # mask shows how there is no padding yet
 # print(train_encodings.keys()) shows all the masks 
 
-
+#############################################
 
 # creating a class for better gestion 
 class MedicalDataset(Dataset):  # from torch.utils.data.Dataset
@@ -122,13 +131,20 @@ train_dataset = MedicalDataset(train_encodings, y_train)
 test_dataset = MedicalDataset(test_encodings, y_test)
 
 
-#########################
+######################################
 
 print("\nPress any key to continue ...")
 readchar.readkey()
 
 # clearing the screen
 subprocess.run(["clear"])
+
+#####################################
+
+
+
+
+
 
 
 
@@ -170,6 +186,11 @@ readchar.readkey()
 
 # clearing the screen
 subprocess.run(["clear"])
+
+#########################################
+
+
+
 
 
 
@@ -214,5 +235,62 @@ readchar.readkey()
 # clearing the screen
 subprocess.run(["clear"])
 
+#########################################
 
 
+
+
+
+
+
+
+###### BERT CLASSIFIER ######
+
+print("\n" + "=" * 50)
+print("MEDINTAKE — BERT DATASET")
+print("=" * 50)
+
+print("\nWEIGHTS LOAD ... \n")
+
+from transformers import AutoModelForSequenceClassification 
+
+# hugging face adds a classification head on bert 
+
+model = AutoModelForSequenceClassification.from_pretrained( # bert model 
+    "bert-base-uncased",    # we use pre-train weights
+    num_labels = 5      # our classification problem has 5 labels 
+)
+
+# using sleep() to hault the code execution
+time.sleep(6)
+
+print("\n" + "=" * 50)
+print("MODEL")
+print("=" * 50)
+
+print(f"Model            : bert-base-uncased")
+print(f"Number of labels : {model.num_labels}")
+print(f"Classifier       : {model.classifier}")
+
+
+# macOS stuff
+device = torch.device(
+    "mps" if torch.backends.mps.is_available() else "cpu"
+)
+model.to(device) # put the model into chosen device 
+
+print("\n" + "=" * 50)
+print("DEVICE")
+print("=" * 50)
+
+print(f"Using           : {device}")
+
+#########################################
+
+print("\nPress any key to continue ...")
+readchar.readkey()
+
+# clearing the screen
+subprocess.run(["clear"])
+
+#########################################
