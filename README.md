@@ -1,6 +1,6 @@
-# Medintake
+# MedIntake
 
-Machine learning-assisted platform for patient intake, case categorization/routing and clinical workflow support.
+Machine learning-assisted platform for patient intake, case categorization/routing, and clinical workflow support.
 
 This project evolves [PW_Triage_ML](https://github.com/cestdove/PW_Triage_ML), my previous thesis project exploring Support Vector Machines for ticket triage and text classification.
 
@@ -14,11 +14,11 @@ The labels used in the dataset are:
 
 | Label | Category | Original Train | Original Test |
 |---:|---|---:|---:|
-| 1 | Neoplasms | 2.530 | 633 |
-| 2 | Digestive system diseases | 1.195 | 299 |
-| 3 | Nervous system diseases | 1.540 | 385 |
-| 4 | Cardiovascular diseases | 2.441 | 610 |
-| 5 | General pathological conditions | 3.844 | 961 |
+| 1 | Neoplasms | 2,530 | 633 |
+| 2 | Digestive system diseases | 1,195 | 299 |
+| 3 | Nervous system diseases | 1,540 | 385 |
+| 4 | Cardiovascular diseases | 2,441 | 610 |
+| 5 | General pathological conditions | 3,844 | 961 |
 
 ## Approach
 
@@ -47,6 +47,14 @@ The BERT pipeline includes:
 
 The Transformer implementation is contained in `src/train_transformer.py`.
 
+## Experiments
+
+Model experiments and benchmark results are documented in the `experiments/` directory.
+
+The current benchmark compares the traditional TF-IDF + LinearSVC baseline with the BERT-based approach, including accuracy, F1 scores, classification reports, and confusion matrices.
+
+See [`experiments/benchmark.md`](experiments/benchmark.md) for the detailed results.
+
 ## Project Structure
 
 ```text
@@ -55,8 +63,15 @@ medintake/
 ├── models/
 ├── notebooks/
 ├── src/
+│   ├── download_dataset.py
+│   ├── train_model.py
+│   ├── train_transformer.py
+│   └── evaluate_transformer.py
+├── experiments/
+│   └── benchmark.md
 ├── README.md
-└── requirements.txt
+├── requirements.txt
+└── LICENSE
 ```
 
 ## Setup
@@ -89,6 +104,14 @@ python src/train_transformer.py
 ```
 
 The Transformer model is fine-tuned using the prepared clinical abstract dataset.
+
+To evaluate a saved BERT model without retraining:
+
+```bash
+python src/evaluate_transformer.py
+```
+
+The evaluation script loads the saved Transformer model from `models/bert-medintake/` and evaluates it on the test set, reporting accuracy, classification metrics, and the confusion matrix.
 
 ## Notebooks
 
