@@ -148,7 +148,8 @@ subprocess.run(["clear"])
 
 
 
-########### OVERVIEW ############
+
+########### MEDICAL DATASET OVERVIEW ############
 
 print("\n" + "=" * 50)
 print("MEDINTAKE — BERT DATASET")
@@ -196,7 +197,8 @@ subprocess.run(["clear"])
 
 
 
-########## DATALOAD INTO BERT ###########
+
+########## DATA LOAD INTO BERT ###########
 print("\n" + "=" * 50)
 print("MEDINTAKE — BERT DATASET")
 print("=" * 50)
@@ -244,7 +246,7 @@ subprocess.run(["clear"])
 
 
 
-###### BERT CLASSIFIER ######
+###### BERT MODEL + CLASSIFIER ######
 
 print("\n" + "=" * 50)
 print("MEDINTAKE — BERT DATASET")
@@ -273,17 +275,52 @@ print(f"Number of labels : {model.num_labels}")
 print(f"Classifier       : {model.classifier}")
 
 
+###### MPS DEVICE MACOS ##############
+
 # macOS stuff
 device = torch.device(
     "mps" if torch.backends.mps.is_available() else "cpu"
 )
-model.to(device) # put the model into chosen device 
+model.to(device) # put the model into chosen device, mps instead of cpu if available
 
 print("\n" + "=" * 50)
 print("DEVICE")
 print("=" * 50)
 
 print(f"Using           : {device}")
+
+#########################################
+
+print("\nPress any key to continue ...")
+readchar.readkey()
+
+# clearing the screen
+subprocess.run(["clear"])
+
+#########################################
+
+
+
+
+
+
+
+
+######### SET ADAM OPZIMIZER ###########
+
+from torch.optim import AdamW
+
+optimizer = AdamW(
+    model.parameters(), # adam modifies BERT and classifier parameters
+    lr=2e-5     # learning rate
+)
+
+print("\n" + "=" * 50)
+print("OPTIMIZER")
+print("=" * 50)
+
+print("Optimizer        : AdamW")
+print("Learning rate    : 2e-5")
 
 #########################################
 
