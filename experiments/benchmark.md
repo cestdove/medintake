@@ -1,30 +1,43 @@
-# Transformer Experiments
+# MedIntake — Model Benchmark
 
-## Baseline
+## Dataset
 
-| Model | Accuracy | Macro F1 |
-|---|---:|---:|
-| TF-IDF + LinearSVC | 50.45% | ~0.50 |
+Medical Abstracts Text Classification Dataset.
+
+- Training samples: 11,550
+- Test samples: 2,888
+- Number of classes: 5
+- Original labels: 1–5
 
 ---
 
-## Experiment 1 — BERT, 1 Epoch
+## Results
+
+| Model | Features | Epochs | Batch Size | Learning Rate | Accuracy | Macro F1 | Weighted F1 |
+|---|---|---:|---:|---:|---:|---:|---:|
+| LinearSVC | TF-IDF | — | — | — | 50.45% | ~0.50 | — |
+| BERT | `bert-base-uncased` | 1 | 8 | 2e-5 | 64.37% | 0.64 | 0.62 |
+
+---
+
+## Experiment 1 — BERT
 
 ### Configuration
 
-- **Model:** `bert-base-uncased`
-- **Epochs:** 1
-- **Batch size:** 8
-- **Learning rate:** `2e-5`
-- **Optimizer:** AdamW
-- **Device:** MPS
+- Model: `bert-base-uncased`
+- Epochs: 1
+- Batch size: 8
+- Optimizer: AdamW
+- Learning rate: `2e-5`
+- Device: MPS
+- Training batches: 1,444
+- Average training loss: `1.0173`
 
 ### Results
 
-- **Training loss:** `1.0173`
-- **Accuracy:** `64.37%`
-- **Macro F1:** `0.64`
-- **Weighted F1:** `0.62`
+- Accuracy: `64.37%`
+- Macro F1: `0.64`
+- Weighted F1: `0.62`
 
 ### Classification Report
 
@@ -48,6 +61,12 @@
 
 ### Observation
 
-BERT improved substantially over the TF-IDF + LinearSVC baseline after one epoch.
+BERT achieved 64.37% accuracy after one epoch, compared with approximately 50.45% for the TF-IDF + LinearSVC baseline.
 
 Class 4 remains the main source of errors, with a recall of 0.36 and an F1-score of 0.46.
+
+---
+
+## Experiment 2 — BERT, 3 Epochs
+
+_To be completed._
