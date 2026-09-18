@@ -263,6 +263,7 @@ model = AutoModelForSequenceClassification.from_pretrained( # bert model
     num_labels = 5      # our classification problem has 5 labels 
 )
 
+
 # using sleep() to hault the code execution
 time.sleep(6)
 
@@ -331,3 +332,121 @@ readchar.readkey()
 subprocess.run(["clear"])
 
 #########################################
+
+
+
+
+
+print("\n" + "=" * 50)
+print("TRAINING ONE EPOCH")
+print("=" * 50)
+
+print("\n") # lol
+
+
+########### TRAINING STEP / ONE EPOCH ################
+
+model.train()
+
+losses = []
+
+for batch_idx, batch in enumerate(train_loader):
+
+    batch = {
+        key: value.to(device)
+        for key, value in batch.items()
+    }
+
+    outputs = model(**batch)
+    loss = outputs.loss
+
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+    losses.append(loss.item())
+
+    from datetime import datetime
+
+    if (batch_idx + 1) % 100 == 0:
+        print(
+            f"[{datetime.now().strftime('%H:%M:%S')}] "
+            f"Batch {batch_idx + 1}/{len(train_loader)} "
+            f"- Loss: {loss.item():.4f}"
+        )
+
+############ TRAIN RESULTS ##################
+
+average_loss = sum(losses) / len(losses)
+
+print("\n" + "=" * 50)
+print("EPOCH RESULTS")
+print("=" * 50)
+
+print(f"Average training loss : {average_loss:.4f}")
+print(f"Batches              : {len(losses)}")
+
+######### SAVE MODEL ####################
+
+model.save_pretrained("models/bert-medintake")
+tokenizer.save_pretrained("models/bert-medintake")
+
+############## EVALUATION ##################
+
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+model.eval() # model in evaluation mode
+
+all_predictions = []
+all_labels = []
+
+with torch.no_grad():
+    for batch in test_loader:
+        batch = {key: value.to(device) for key, value in batch.items()}
+
+        outputs = model(**batch)
+        predictions = torch.argmax(outputs.logits, dim=1)
+
+        all_predictions.extend(predictions.cpu().tolist())
+        all_labels.extend(batch["labels"].cpu().tolist())
+
+# accuracy 
+print(f"Accuracy: {accuracy_score(all_labels, all_predictions):.4f}")
+print(classification_report(all_labels, all_predictions))
+
+# confusion matrix
+cm = confusion_matrix(all_labels, all_predictions)
+print("\nConfusion Matrix:")
+print(cm)
+
+
+############### GRAPHS ####################
+
+# commented to not make it lag lol
+
+#import matplotlib.pyplot as plt 
+
+#plt.figure(figsize=(10, 5))
+#plt.plot(losses)
+#plt.xlabel("Batch")
+#plt.ylabel("Loss")
+#plt.title("Training loss")
+#plt.grid(True)
+#plt.show()
+
+#########################################
+
+print("\nPress any key to continue ...")
+readchar.readkey()
+
+# clearing the screen
+subprocess.run(["clear"])
+
+#########################################
+
+
+
+
+
+
+
