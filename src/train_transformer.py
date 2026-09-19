@@ -338,42 +338,46 @@ subprocess.run(["clear"])
 
 
 print("\n" + "=" * 50)
-print("TRAINING ONE EPOCH")
+print("TRAINING - 3 EPOCHS")
 print("=" * 50)
 
 print("\n") # lol
 
 
-########### TRAINING STEP / ONE EPOCH ################
+########### TRAINING STEP / 3 EPOCHS ################
 
 model.train()
 
 losses = []
 
-for batch_idx, batch in enumerate(train_loader):
+for epoch in range(3): # add 3 epochs instead on 1 
 
-    batch = {
-        key: value.to(device)
-        for key, value in batch.items()
-    }
+    print(f"\nEPOCH {epoch + 1}/3")
 
-    outputs = model(**batch)
-    loss = outputs.loss
+    for batch_idx, batch in enumerate(train_loader):
 
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
+        batch = {
+            key: value.to(device)
+            for key, value in batch.items()
+        }
 
-    losses.append(loss.item())
+        outputs = model(**batch)
+        loss = outputs.loss
 
-    from datetime import datetime
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
 
-    if (batch_idx + 1) % 100 == 0:
-        print(
-            f"[{datetime.now().strftime('%H:%M:%S')}] "
-            f"Batch {batch_idx + 1}/{len(train_loader)} "
-            f"- Loss: {loss.item():.4f}"
-        )
+        losses.append(loss.item())
+
+        from datetime import datetime
+
+        if (batch_idx + 1) % 100 == 0:
+            print(
+                f"[{datetime.now().strftime('%H:%M:%S')}] "
+                f"Batch {batch_idx + 1}/{len(train_loader)} "
+                f"- Loss: {loss.item():.4f}"
+            )
 
 ############ TRAIN RESULTS ##################
 
