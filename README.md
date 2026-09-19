@@ -47,11 +47,39 @@ The BERT pipeline includes:
 
 The Transformer implementation is contained in `src/train_transformer.py`.
 
+### Model Development
+
+The project follows an iterative experimental approach rather than relying on a single model configuration.
+
+The current development path includes:
+
+```text
+TF-IDF + LinearSVC
+        ↓
+BERT fine-tuning
+        ↓
+BERT training optimization
+        ↓
+RoBERTa comparison
+        ↓
+Domain-adaptive pre-training
+```
+
+Experiments are evaluated using the same held-out test set and compared using accuracy, macro F1, weighted F1, classification reports, and confusion matrices.
+
 ## Experiments
 
 Model experiments and benchmark results are documented in the `experiments/` directory.
 
-The current benchmark compares the traditional TF-IDF + LinearSVC baseline with the BERT-based approach, including accuracy, F1 scores, classification reports, and confusion matrices.
+The current benchmark compares the traditional TF-IDF + LinearSVC baseline with BERT-based approaches. The benchmark currently includes:
+
+| Model | Epochs | Accuracy |
+|---|---:|---:|
+| TF-IDF + LinearSVC | — | 50.45% |
+| BERT (`bert-base-uncased`) | 1 | 64.37% |
+| BERT (`bert-base-uncased`) | 3 | 65.17% |
+
+Further experiments, including optimized BERT and RoBERTa configurations, will be added as development continues.
 
 See [`experiments/benchmark.md`](experiments/benchmark.md) for the detailed results.
 
