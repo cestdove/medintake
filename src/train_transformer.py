@@ -2,7 +2,12 @@
 
 # useful libs
 import pandas as pd
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import (
+    AutoTokenizer, 
+    AutoModelForSequenceClassification, 
+    DataCollatorWithPadding,  # to add dynamic padding
+    get_linear_schedule_with_warmup # adding lr schedule/warmup 
+    )
 
 # torch utilities
 import torch
@@ -75,14 +80,17 @@ y_test = [label - 1 for label in df_test["condition_label"].tolist()]
 # tokenization of the entire dataset
 train_encodings = tokenizer(
     X_train,    # all medical descriptions
-    truncation=True,    # if text lenght is longer than what BERT requires it's cutted
-    padding=True    # shorter texts are filled with padding to the required lenght
+    truncation=True    # if text lenght is longer than what BERT requires it's cutted
 )
 
 test_encodings = tokenizer(     # same goes here...
     X_test,
-    truncation=True,
-    padding=True
+    truncation=True
+)
+
+# creating data collator with padding as hf recommend done at each batch creation 
+data_collator = DataCollatorWithPadding(
+    tokenizer=tokenizer
 )
 
 
@@ -205,22 +213,26 @@ print("=" * 50)
 
 from torch.utils.data import DataLoader
 
+
+# DATA LOADERS #
 train_loader = DataLoader(
     train_dataset,
     batch_size=8,   # 8 cases each batch
-    shuffle=True    # all the cases are mixed during the training process 
+    shuffle=True,   # all the cases are mixed during the training process 
+    collate_fn=data_collator # adding data collator
 )
 
 test_loader = DataLoader(
     test_dataset,   
-    batch_size=8
+    batch_size=8,
+    collate_fn=data_collator
 )   # not essential to shuffle on test 
+
 
 
 batch = next(iter(train_loader))
 
 print("\nDATALOADER")
-
 
 print(f"Batch size       : {batch['input_ids'].shape[0]}")
 print(f"Input shape      : {batch['input_ids'].shape}")
@@ -228,6 +240,13 @@ print(f"Attention shape  : {batch['attention_mask'].shape}")
 print(f"Labels shape     : {batch['labels'].shape}")
 print(f"Labels           : {batch['labels'].tolist()}")
 
+print("\nChecking sequence lengths for 5 batches:") # check for better compute complexity 
+
+for i, batch in enumerate(train_loader):
+    print(f"Batch {i + 1}: {batch['input_ids'].shape}")
+
+    if i == 4:
+        break
 
 #########################################
 
@@ -311,9 +330,21 @@ subprocess.run(["clear"])
 
 from torch.optim import AdamW
 
-optimizer = AdamW(
+optimizer = AdamW( # adamW optimizer 
     model.parameters(), # adam modifies BERT and classifier parameters
-    lr=2e-5     # learning rate
+    lr=2e-5     # starting learning rate
+)
+
+# adding lr warmup for better performance
+num_epochs = 3
+
+num_training_steps = len(train_loader) * num_epochs
+num_warmup_steps = int(0.1 * num_training_steps)
+
+scheduler = get_linear_schedule_with_warmup( # warmup scheduler lr
+    optimizer,
+    num_warmup_steps=num_warmup_steps,
+    num_training_steps=num_training_steps
 )
 
 print("\n" + "=" * 50)
@@ -341,8 +372,6 @@ print("\n" + "=" * 50)
 print("TRAINING - 3 EPOCHS")
 print("=" * 50)
 
-print("\n") # lol
-
 
 ########### TRAINING STEP / 3 EPOCHS ################
 
@@ -350,9 +379,8 @@ model.train()
 
 losses = []
 
-for epoch in range(3): # add 3 epochs instead on 1 
-
-    print(f"\nEPOCH {epoch + 1}/3")
+for epoch in range(num_epochs): # add 3 epochs instead on 1 
+    print(f"\nEPOCH {epoch + 1}/{num_epochs}")
 
     for batch_idx, batch in enumerate(train_loader):
 
@@ -367,9 +395,11 @@ for epoch in range(3): # add 3 epochs instead on 1
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+        scheduler.step()
 
         losses.append(loss.item())
 
+        # time import for better read
         from datetime import datetime
 
         if (batch_idx + 1) % 100 == 0:
@@ -378,6 +408,7 @@ for epoch in range(3): # add 3 epochs instead on 1
                 f"Batch {batch_idx + 1}/{len(train_loader)} "
                 f"- Loss: {loss.item():.4f}"
             )
+    
 
 ############ TRAIN RESULTS ##################
 
@@ -454,3 +485,4 @@ subprocess.run(["clear"])
 
 
 
+  

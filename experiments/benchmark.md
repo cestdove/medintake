@@ -18,6 +18,7 @@ Medical Abstracts Text Classification Dataset.
 | LinearSVC | TF-IDF | — | — | — | 50.45% | ~0.50 | — |
 | BERT | `bert-base-uncased` | 1 | 8 | 2e-5 | 64.37% | 0.64 | 0.62 |
 | BERT | `bert-base-uncased` | 3 | 8 | 2e-5 | **65.17%** | **0.65** | **0.63** |
+| BERT + LR Scheduler | `bert-base-uncased` | 3 | 8 | 2e-5 | 63.12% | 0.63 | 0.62 |
 
 ---
 
@@ -123,19 +124,61 @@ The results suggest that simply increasing the number of fine-tuning epochs prov
 
 ---
 
-## Experiment 3 — BERT + Dynamic Padding
+## Experiment 3 — BERT + Dynamic Padding + LR Scheduler
 
-_To be completed._
-
-### Planned Configuration
+### Configuration
 
 - Model: `bert-base-uncased`
 - Epochs: 3
 - Batch size: 8
 - Optimizer: AdamW
-- Learning rate: `2e-5`
+- Initial learning rate: `2e-5`
+- Learning rate scheduler: linear decay
+- Warmup: 10% of training steps
 - Dynamic padding: enabled
 - Device: MPS
+- Training batches: 4,332
+- Average training loss: `0.8493`
+
+### Results
+
+- Accuracy: `63.12%`
+- Macro F1: `0.63`
+- Weighted F1: `0.62`
+
+### Classification Report
+
+| Class | Precision | Recall | F1 | Support |
+|---|---:|---:|---:|---:|
+| 0 | 0.68 | 0.83 | 0.75 | 633 |
+| 1 | 0.53 | 0.60 | 0.56 | 299 |
+| 2 | 0.60 | 0.60 | 0.60 | 385 |
+| 3 | 0.67 | 0.81 | 0.73 | 610 |
+| 4 | 0.60 | 0.41 | 0.49 | 961 |
+
+### Confusion Matrix
+
+| Actual / Predicted | 0 | 1 | 2 | 3 | 4 |
+|---|---:|---:|---:|---:|---:|
+| **0** | 523 | 21 | 20 | 16 | 53 |
+| **1** | 42 | 179 | 8 | 8 | 62 |
+| **2** | 35 | 11 | 231 | 32 | 76 |
+| **3** | 15 | 10 | 21 | 495 | 69 |
+| **4** | 154 | 114 | 106 | 192 | 395 |
+
+### Observation
+
+Adding dynamic padding, a linear learning-rate scheduler, and a 10% warmup period did not improve overall test performance.
+
+Compared with the three-epoch BERT configuration using a constant learning rate:
+
+- Accuracy: `65.17% → 63.12%`
+- Macro F1: `0.65 → 0.63`
+- Weighted F1: `0.63 → 0.62`
+
+Class 4 recall increased from `0.38` to `0.41`, but its F1-score remained at `0.49`. Performance decreased across several of the other classes, particularly classes 1 and 2.
+
+The experiment suggests that the linear learning-rate schedule with 10% warmup does not provide an advantage for the current fine-tuning setup. The three-epoch BERT configuration with a constant `2e-5` learning rate remains the best-performing configuration tested so far.
 
 ---
 

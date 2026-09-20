@@ -55,13 +55,13 @@ The current development path includes:
 
 ```text
 TF-IDF + LinearSVC
-        ↓
+       ↓
 BERT fine-tuning
-        ↓
+       ↓
 BERT training optimization
-        ↓
+       ↓
 RoBERTa comparison
-        ↓
+       ↓
 Domain-adaptive pre-training
 ```
 
@@ -71,15 +71,20 @@ Experiments are evaluated using the same held-out test set and compared using ac
 
 Model experiments and benchmark results are documented in the `experiments/` directory.
 
-The current benchmark compares the traditional TF-IDF + LinearSVC baseline with BERT-based approaches. The benchmark currently includes:
+The current benchmark compares the traditional TF-IDF + LinearSVC baseline with several BERT-based configurations:
 
-| Model | Epochs | Accuracy |
-|---|---:|---:|
-| TF-IDF + LinearSVC | — | 50.45% |
-| BERT (`bert-base-uncased`) | 1 | 64.37% |
-| BERT (`bert-base-uncased`) | 3 | 65.17% |
+| Model | Epochs | Accuracy | Macro F1 |
+|---|---:|---:|---:|
+| TF-IDF + LinearSVC | — | 50.45% | ~0.50 |
+| BERT (`bert-base-uncased`) | 1 | 64.37% | 0.64 |
+| BERT (`bert-base-uncased`) | 3 | **65.17%** | **0.65** |
+| BERT + LR scheduler + warmup | 3 | 63.12% | 0.63 |
 
-Further experiments, including optimized BERT and RoBERTa configurations, will be added as development continues.
+The three-epoch BERT configuration with a constant learning rate of `2e-5` currently provides the highest test accuracy among the configurations evaluated.
+
+The scheduler experiment used dynamic padding, a linear learning-rate scheduler, and 10% warmup. It did not improve performance over the constant-learning-rate configuration.
+
+Further experiments, including RoBERTa and domain-adaptive pre-training, will be added as development continues.
 
 See [`experiments/benchmark.md`](experiments/benchmark.md) for the detailed results.
 
