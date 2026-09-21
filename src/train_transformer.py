@@ -6,7 +6,6 @@ from transformers import (
     AutoTokenizer, 
     AutoModelForSequenceClassification, 
     DataCollatorWithPadding,  # to add dynamic padding
-    get_linear_schedule_with_warmup # adding lr schedule/warmup 
     )
 
 # torch utilities
@@ -22,12 +21,14 @@ import readchar
 
 
 
+MODEL_NAME = "roberta-base" # to write faster
+
 
 
 ######### READING THE CSV FILES #########
 
 print("\n" + "=" * 50)
-print("MEDINTAKE — BERT DATASET")
+print("MEDINTAKE — RoBERTa DATASET")
 print("=" * 50)
 
 # train/test load
@@ -61,12 +62,12 @@ subprocess.run(["clear"])
 ###### TOKENIZATION PHASE #########
 
 print("\n" + "=" * 50)
-print("MEDINTAKE — BERT DATASET")
+print("MEDINTAKE — RoBERTa DATASET")
 print("=" * 50)
 
 print("\nStarting tokenization process ...\n")
-# tokenizer chosen automatically for BERT
-tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+# tokenizer chosen automatically for ROBERTA
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
 time.sleep(6)
 
@@ -80,7 +81,7 @@ y_test = [label - 1 for label in df_test["condition_label"].tolist()]
 # tokenization of the entire dataset
 train_encodings = tokenizer(
     X_train,    # all medical descriptions
-    truncation=True    # if text lenght is longer than what BERT requires it's cutted
+    truncation=True    # if text lenght is longer than what roberta requires it's cutted
 )
 
 test_encodings = tokenizer(     # same goes here...
@@ -99,8 +100,8 @@ print("\nType of the encoding created by the tokenizer: ")
 print(type(train_encodings))    # type of the encoding created by the tokenizer
 
 
-print("\nFirst BERT token IDs (101 = [CLS] / 102 = [SEP]): ")
-print(train_encodings["input_ids"][0][:20])     # BERT token IDs where 101 is [CLS]
+print("\nFirst RoBERTa token IDs: ")
+print(train_encodings["input_ids"][0][:20])     
 
 
 print("\nAttention mask for each token showed above (1 = real token / 0 = padding): ")
@@ -160,13 +161,13 @@ subprocess.run(["clear"])
 ########### MEDICAL DATASET OVERVIEW ############
 
 print("\n" + "=" * 50)
-print("MEDINTAKE — BERT DATASET")
+print("MEDINTAKE — RoBERTa DATASET")
 print("=" * 50)
 
 print(f"Training samples : {len(train_dataset)}")
 print(f"Test samples     : {len(test_dataset)}")
 print("Labels           : 5")
-print("Model            : bert-base-uncased")
+print("Model            : roberta-base")
 
 time.sleep(6)
 
@@ -278,7 +279,7 @@ from transformers import AutoModelForSequenceClassification
 # hugging face adds a classification head on bert 
 
 model = AutoModelForSequenceClassification.from_pretrained( # bert model 
-    "bert-base-uncased",    # we use pre-train weights
+    MODEL_NAME,    # we use pre-train weights
     num_labels = 5      # our classification problem has 5 labels 
 )
 
@@ -290,7 +291,7 @@ print("\n" + "=" * 50)
 print("MODEL")
 print("=" * 50)
 
-print(f"Model            : bert-base-uncased")
+print(f"Model            : roberta-base")
 print(f"Number of labels : {model.num_labels}")
 print(f"Classifier       : {model.classifier}")
 
@@ -337,15 +338,6 @@ optimizer = AdamW( # adamW optimizer
 
 # adding lr warmup for better performance
 num_epochs = 3
-
-num_training_steps = len(train_loader) * num_epochs
-num_warmup_steps = int(0.1 * num_training_steps)
-
-scheduler = get_linear_schedule_with_warmup( # warmup scheduler lr
-    optimizer,
-    num_warmup_steps=num_warmup_steps,
-    num_training_steps=num_training_steps
-)
 
 print("\n" + "=" * 50)
 print("OPTIMIZER")
@@ -395,7 +387,6 @@ for epoch in range(num_epochs): # add 3 epochs instead on 1
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        scheduler.step()
 
         losses.append(loss.item())
 
@@ -423,8 +414,8 @@ print(f"Batches              : {len(losses)}")
 
 ######### SAVE MODEL ####################
 
-model.save_pretrained("models/bert-medintake")
-tokenizer.save_pretrained("models/bert-medintake")
+model.save_pretrained("models/roberta-medintake")
+tokenizer.save_pretrained("models/roberta-medintake")
 
 ############## EVALUATION ##################
 
