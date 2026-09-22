@@ -17,6 +17,9 @@ import time
 import subprocess
 import readchar 
 
+# time import for better read
+from datetime import datetime
+
 ##############################
 
 
@@ -81,12 +84,14 @@ y_test = [label - 1 for label in df_test["condition_label"].tolist()]
 # tokenization of the entire dataset
 train_encodings = tokenizer(
     X_train,    # all medical descriptions
-    truncation=True    # if text lenght is longer than what roberta requires it's cutted
+    truncation=True,    # if text lenght is longer than what roberta requires it's cutted
+    max_leght=256
 )
 
 test_encodings = tokenizer(     # same goes here...
     X_test,
-    truncation=True
+    truncation=True,
+    max_lenght=256
 )
 
 # creating data collator with padding as hf recommend done at each batch creation 
@@ -374,6 +379,8 @@ losses = []
 for epoch in range(num_epochs): # add 3 epochs instead on 1 
     print(f"\nEPOCH {epoch + 1}/{num_epochs}")
 
+    epoch_losses = []
+
     for batch_idx, batch in enumerate(train_loader):
 
         batch = {
@@ -388,10 +395,10 @@ for epoch in range(num_epochs): # add 3 epochs instead on 1
         loss.backward()
         optimizer.step()
 
-        losses.append(loss.item())
+        loss_value = loss.item()
 
-        # time import for better read
-        from datetime import datetime
+        losses.append(loss_value)
+        epoch_losses.append(loss_value)
 
         if (batch_idx + 1) % 100 == 0:
             print(
@@ -399,6 +406,14 @@ for epoch in range(num_epochs): # add 3 epochs instead on 1
                 f"Batch {batch_idx + 1}/{len(train_loader)} "
                 f"- Loss: {loss.item():.4f}"
             )
+
+            # loss average of this epoch 
+        average_epoch_loss = sum(epoch_losses) / len(epoch_losses)
+
+    print(
+        f"Epoch {epoch + 1} completed "
+        f"- Average Loss: {average_epoch_loss:.4f}"
+        )
     
 
 ############ TRAIN RESULTS ##################
@@ -469,11 +484,5 @@ readchar.readkey()
 subprocess.run(["clear"])
 
 #########################################
-
-
-
-
-
-
 
   

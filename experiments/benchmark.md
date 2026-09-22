@@ -21,9 +21,7 @@
 | BERT | `bert-base-uncased` | 1 | 8 | `2e-5` | 64.37% | 0.64 | 0.62 |
 | BERT | `bert-base-uncased` | 3 | 8 | `2e-5` | **65.17%** | **0.65** | **0.63** |
 | BERT + LR Scheduler | `bert-base-uncased` | 3 | 8 | `2e-5` | 63.12% | 0.63 | 0.62 |
-| RoBERTa | `roberta-base` | 3* | 8 | `2e-5` | — | — | — |
-
-\* Training was interrupted during the second epoch; no final evaluation metrics are reported.
+| RoBERTa | `roberta-base` | 3 | 8 | `2e-5` | 63.61% | 0.63 | 0.61 |
 
 ---
 
@@ -212,7 +210,7 @@ The three-epoch BERT configuration with a constant `2e-5` learning rate remains 
 ## Configuration
 
 - Model: `roberta-base`
-- Planned epochs: 3
+- Epochs: 3
 - Batch size: 8
 - Optimizer: AdamW
 - Learning rate: `2e-5`
@@ -220,34 +218,52 @@ The three-epoch BERT configuration with a constant `2e-5` learning rate remains 
 - Dynamic padding: enabled
 - Learning-rate scheduler: none
 - Training batches per epoch: 1,444
+- Total training batches: 4,332
+- Average training loss: `0.8422`
 
-## Status
+## Results
 
-The RoBERTa experiment was started using the same main training configuration as the best-performing BERT experiment.
+- Accuracy: **63.61%**
+- Macro F1: **0.63**
+- Weighted F1: **0.61**
 
-The tokenizer and `RobertaForSequenceClassification` model initialized successfully with five output classes, and training started successfully on MPS.
+## Classification Report
 
-The run was interrupted during the **second epoch** because training throughput was substantially slower than the previous BERT experiments on the current hardware.
+| Class | Precision | Recall | F1 | Support |
+|---|---:|---:|---:|---:|
+| 0 | 0.70 | 0.83 | 0.76 | 633 |
+| 1 | 0.53 | 0.76 | 0.62 | 299 |
+| 2 | 0.59 | 0.68 | 0.63 | 385 |
+| 3 | 0.61 | 0.90 | 0.73 | 610 |
+| 4 | 0.75 | 0.28 | 0.41 | 961 |
 
-### Training Progress Before Interruption
+## Confusion Matrix
 
-**Epoch 1/3**
+| Actual / Predicted | 0 | 1 | 2 | 3 | 4 |
+|---|---:|---:|---:|---:|---:|
+| **0** | 527 | 26 | 34 | 24 | 22 |
+| **1** | 38 | 227 | 5 | 11 | 18 |
+| **2** | 22 | 11 | 263 | 56 | 33 |
+| **3** | 12 | 16 | 14 | 548 | 20 |
+| **4** | 159 | 149 | 128 | 253 | 272 |
 
-- Batch 1,400/1,444 reached
-- Final logged batch loss: `0.7349`
+## Observation
 
-**Epoch 2/3**
+RoBERTa achieved **63.61% accuracy**, with a Macro F1 of **0.63** and Weighted F1 of **0.61**.
 
-- Batch 800/1,444 reached
-- Final logged batch loss before interruption: `0.5185`
+Compared with the three-epoch BERT configuration using a constant learning rate:
 
-The logged batch losses are not used as final evaluation metrics because they represent individual training batches rather than performance on the held-out test set.
+| Metric | BERT 3 Epochs | RoBERTa 3 Epochs | Change |
+|---|---:|---:|---:|
+| Accuracy | **65.17%** | 63.61% | -1.56 pp |
+| Macro F1 | **0.65** | 0.63 | -0.02 |
+| Weighted F1 | **0.63** | 0.61 | -0.02 |
 
-### Evaluation
+RoBERTa also required substantially longer training time on the current MPS hardware. The complete three-epoch run took approximately eight hours.
 
-No final test evaluation was performed for this run.
+Class 4 remained the main source of errors, with a recall of `0.28` and an F1-score of `0.41`.
 
-Therefore, **no accuracy, Macro F1, Weighted F1, or confusion matrix is reported for RoBERTa**.
+The results show that, under the tested configuration, RoBERTa did not improve over the BERT baseline despite completing the full three-epoch training run.
 
 ---
 
@@ -267,7 +283,15 @@ with:
 
 Increasing BERT training from one to three epochs produced only a modest improvement, while the tested scheduler + warmup configuration performed worse on the held-out test set.
 
-RoBERTa was successfully initialized and trained, but its run was interrupted before evaluation because of substantially slower training throughput on the current hardware.
+RoBERTa completed the full three-epoch experiment but achieved lower test performance than BERT:
+
+- Accuracy: `63.61%`
+- Macro F1: `0.63`
+- Weighted F1: `0.61`
+
+RoBERTa also required substantially more training time on the current hardware.
+
+Across the completed Transformer experiments, **class 4 consistently represents the most difficult class**, particularly in terms of recall.
 
 ---
 

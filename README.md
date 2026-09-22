@@ -71,20 +71,23 @@ Experiments are evaluated using the same held-out test set and compared using ac
 
 Model experiments and benchmark results are documented in the `experiments/` directory.
 
-The current benchmark compares the traditional TF-IDF + LinearSVC baseline with several BERT-based configurations:
+The current benchmark compares the traditional TF-IDF + LinearSVC baseline with several Transformer configurations:
 
-| Model | Epochs | Accuracy | Macro F1 |
-|---|---:|---:|---:|
-| TF-IDF + LinearSVC | — | 50.45% | ~0.50 |
-| BERT (`bert-base-uncased`) | 1 | 64.37% | 0.64 |
-| BERT (`bert-base-uncased`) | 3 | **65.17%** | **0.65** |
-| BERT + LR scheduler + warmup | 3 | 63.12% | 0.63 |
+| Model | Epochs | Accuracy | Macro F1 | Weighted F1 |
+|---|---:|---:|---:|---:|
+| TF-IDF + LinearSVC | — | 50.45% | ~0.50 | — |
+| BERT (`bert-base-uncased`) | 1 | 64.37% | 0.64 | 0.62 |
+| BERT (`bert-base-uncased`) | 3 | **65.17%** | **0.65** | **0.63** |
+| BERT + LR scheduler + warmup | 3 | 63.12% | 0.63 | 0.62 |
+| RoBERTa (`roberta-base`) | 3 | 63.61% | 0.63 | 0.61 |
 
 The three-epoch BERT configuration with a constant learning rate of `2e-5` currently provides the highest test accuracy among the configurations evaluated.
 
 The scheduler experiment used dynamic padding, a linear learning-rate scheduler, and 10% warmup. It did not improve performance over the constant-learning-rate configuration.
 
-Further experiments, including RoBERTa and domain-adaptive pre-training, will be added as development continues.
+The RoBERTa experiment completed three epochs but achieved lower test performance than the three-epoch BERT configuration. It also required substantially longer training time on the current MPS hardware.
+
+Further experiments will focus on more recent Transformer architectures and biomedical-domain pretrained models.
 
 See [`experiments/benchmark.md`](experiments/benchmark.md) for the detailed results.
 
@@ -130,7 +133,7 @@ python src/train_model.py
 
 The trained model and TF-IDF vectorizer are saved in the `models/` directory.
 
-To train the BERT-based model:
+To train the Transformer-based model:
 
 ```bash
 python src/train_transformer.py
@@ -138,7 +141,7 @@ python src/train_transformer.py
 
 The Transformer model is fine-tuned using the prepared clinical abstract dataset.
 
-To evaluate a saved BERT model without retraining:
+To evaluate a saved Transformer model without retraining:
 
 ```bash
 python src/evaluate_transformer.py
