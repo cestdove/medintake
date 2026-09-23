@@ -361,7 +361,7 @@ from torch.optim import AdamW
 
 optimizer = AdamW( # adamW optimizer 
     model.parameters(), # adam modifies BERT and classifier parameters
-    lr=2e-5     # starting learning rate
+    lr=1e-5     # starting learning rate
 )
 
 # adding lr warmup for better performance
@@ -372,7 +372,7 @@ print("OPTIMIZER")
 print("=" * 50)
 
 print("Optimizer        : AdamW")
-print("Learning rate    : 2e-5")
+print("Learning rate    : 1e-5")
 
 #########################################
 

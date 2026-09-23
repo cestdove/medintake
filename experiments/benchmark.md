@@ -363,6 +363,79 @@ Because the validation split reduces the amount of data available for training, 
 
 The experiment establishes a validation-based training setup for subsequent hyperparameter experiments.
 
+---
+
+# Experiment 6 — RoBERTa + Learning Rate 1e-5
+
+## Configuration
+
+- Model: `roberta-base`
+- Epochs: 3
+- Batch size: 8
+- Optimizer: AdamW
+- Learning rate: `1e-5`
+- Maximum sequence length: `256`
+- Validation split: 10%
+- Split strategy: stratified
+- Random state: 42
+- Device: MPS
+- Dynamic padding: enabled
+- Learning-rate scheduler: none
+- Training batches per epoch: 1,300
+- Total training batches: 3,900
+
+The configuration is identical to Experiment 5 except for the learning rate, which was reduced from `2e-5` to `1e-5`.
+
+## Results
+
+- Average training loss: `0.8435`
+- Validation loss:
+  - Epoch 1: `0.8753`
+  - Epoch 2: `0.8225`
+  - Epoch 3: `0.8400`
+- Test Accuracy: **`62.98%`**
+- Test Macro F1: **`0.63`**
+- Test Weighted F1: **`0.61`**
+
+## Classification Report
+
+| Class | Precision | Recall | F1 | Support |
+|---|---:|---:|---:|---:|
+| 0 | 0.67 | 0.83 | 0.74 | 633 |
+| 1 | 0.53 | 0.67 | 0.59 | 299 |
+| 2 | 0.58 | 0.65 | 0.61 | 385 |
+| 3 | 0.66 | 0.82 | 0.73 | 610 |
+| 4 | 0.64 | 0.36 | 0.46 | 961 |
+
+## Confusion Matrix
+
+| Actual / Predicted | 0 | 1 | 2 | 3 | 4 |
+|---|---:|---:|---:|---:|---:|
+| **0** | 524 | 30 | 32 | 16 | 31 |
+| **1** | 36 | 200 | 8 | 5 | 50 |
+| **2** | 32 | 10 | 250 | 34 | 59 |
+| **3** | 16 | 9 | 27 | 501 | 57 |
+| **4** | 171 | 131 | 117 | 198 | 344 |
+
+## Observation
+
+Reducing the learning rate from `2e-5` to `1e-5` improved test accuracy from `61.98%` to `62.98%` under the validation-based RoBERTa setup.
+
+| Metric | LR `2e-5` | LR `1e-5` | Change |
+|---|---:|---:|---:|
+| Accuracy | 61.98% | **62.98%** | +1.00 pp |
+| Macro F1 | 0.62 | **0.63** | +0.01 |
+| Weighted F1 | 0.61 | 0.61 | 0.00 |
+
+Validation loss reached its minimum after the second epoch (`0.8225`) and increased slightly by the third epoch (`0.8400`), while training loss continued to decrease.
+
+This provides an initial indication that the third epoch may introduce some overfitting under the `1e-5` learning rate, although the difference in validation loss is small.
+
+Class 4 remained the most difficult class, with a recall of `0.36` and an F1-score of `0.46`.
+
+The experiment supports continuing hyperparameter development with the `1e-5` learning rate while keeping the remaining configuration fixed.
+---
+
 ## Next Experiments
 
 Planned directions include:
