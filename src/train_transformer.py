@@ -24,7 +24,8 @@ from datetime import datetime
 
 # HYPERPARAMETERS SHORTCUT
 # easier to modify 
-MODEL_NAME = "roberta-base" 
+model_str = "bert-base-uncased" # text for strings
+MODEL_NAME = model_str # for execution model naming
 learning_rate = 1e-5
 num_epochs = 2
 
@@ -122,7 +123,7 @@ print("\nType of the encoding created by the tokenizer: ")
 print(type(train_encodings))    # type of the encoding created by the tokenizer
 
 
-print("\nFirst RoBERTa token IDs: ")
+print(f"\nFirst {model_str} token IDs: ")
 print(train_encodings["input_ids"][0][:20])     
 
 
@@ -190,7 +191,7 @@ print("=" * 50)
 print(f"Training samples : {len(train_dataset)}")
 print(f"Test samples     : {len(test_dataset)}")
 print("Labels           : 5")
-print("Model            : roberta-base")
+print(f"Model            : {model_str}")
 
 time.sleep(6)
 
@@ -320,7 +321,7 @@ print("\n" + "=" * 50)
 print("MODEL")
 print("=" * 50)
 
-print(f"Model            : roberta-base")
+print(f"Model            : {model_str}")
 print(f"Number of labels : {model.num_labels}")
 print(f"Classifier       : {model.classifier}")
 
@@ -399,6 +400,8 @@ losses = []
 for epoch in range(num_epochs): # add 2 epochs 
     print(f"\nEPOCH {epoch + 1}/{num_epochs}")
 
+    print(f"\nEpoch {epoch + 1}/{num_epochs} started at {datetime.now().strftime('%H:%M:%S')}")
+
     epoch_losses = []
 
     for batch_idx, batch in enumerate(train_loader):
@@ -471,8 +474,8 @@ print(f"Batches              : {len(losses)}")
 
 ######### SAVE MODEL ####################
 
-model.save_pretrained("models/roberta-medintake")
-tokenizer.save_pretrained("models/roberta-medintake")
+model.save_pretrained("models/bert-medintake-val")
+tokenizer.save_pretrained("models/bert-medintake-val")
 
 ############## EVALUATION ##################
 

@@ -504,6 +504,79 @@ Class 4 also showed improved recall compared with the three-epoch configuration,
 
 The results indicate that, within this validation-based configuration, two epochs with a `1e-5` learning rate provided better test performance than three epochs.
 
+# Experiment 8 — BERT + Validation Split
+
+---
+
+## Configuration
+
+- Model: `bert-base-uncased`
+- Epochs: 2
+- Batch size: 8
+- Optimizer: AdamW
+- Learning rate: `1e-5`
+- Maximum sequence length: `256`
+- Validation split: 10%
+- Split strategy: stratified
+- Random state: 42
+- Device: MPS
+- Dynamic padding: enabled
+- Learning-rate scheduler: none
+- Training batches per epoch: 1,300
+- Total training batches: 2,600
+
+The configuration follows the same validation-based protocol used in Experiments 5–7. The learning rate and number of epochs match Experiment 7, while the Transformer architecture is changed from RoBERTa to BERT.
+
+## Results
+
+- Average training loss: `0.9531`
+- Validation loss:
+  - Epoch 1: `0.8793`
+  - Epoch 2: `0.8692`
+- Test Accuracy: **`64.34%`**
+- Test Macro F1: **`0.64`**
+- Test Weighted F1: **`0.63`**
+
+## Classification Report
+
+| Class | Precision | Recall | F1 | Support |
+|---|---:|---:|---:|---:|
+| 0 | 0.66 | 0.91 | 0.76 | 633 |
+| 1 | 0.58 | 0.67 | 0.62 | 299 |
+| 2 | 0.62 | 0.61 | 0.61 | 385 |
+| 3 | 0.68 | 0.79 | 0.73 | 610 |
+| 4 | 0.63 | 0.38 | 0.48 | 961 |
+
+## Confusion Matrix
+
+| Actual / Predicted | 0 | 1 | 2 | 3 | 4 |
+|---|---:|---:|---:|---:|---:|
+| **0** | 574 | 13 | 13 | 8 | 25 |
+| **1** | 47 | 200 | 4 | 5 | 43 |
+| **2** | 45 | 9 | 235 | 27 | 69 |
+| **3** | 17 | 8 | 25 | 480 | 80 |
+| **4** | 187 | 117 | 103 | 185 | 369 |
+
+## Observation
+
+BERT achieved **64.34% test accuracy**, with a Macro F1 of **0.64** and Weighted F1 of **0.63** under the validation-based training protocol.
+
+Validation loss decreased from `0.8793` after the first epoch to `0.8692` after the second epoch, while training loss decreased from `1.0698` to `0.8364`.
+
+Compared with the matched two-epoch RoBERTa configuration from Experiment 7:
+
+| Metric | BERT | RoBERTa | Difference |
+|---|---:|---:|---:|
+| Accuracy | **64.34%** | 63.99% | **+0.35 pp** |
+| Macro F1 | 0.64 | 0.64 | 0.00 |
+| Weighted F1 | 0.63 | 0.63 | 0.00 |
+
+The two models produced the same Macro F1 and Weighted F1 at the reported precision, while BERT achieved a 0.35 percentage-point higher test accuracy.
+
+Class 4 remained the most difficult class, with a recall of `0.38` and an F1-score of `0.48`.
+
+The results provide a controlled comparison between BERT and RoBERTa under the same validation-based training configuration.
+
 ---
 
 ## Next Experiments
