@@ -78,6 +78,16 @@ time.sleep(6)
 X_train = df_train["medical_abstract"].tolist()
 y_train = [label - 1 for label in df_train["condition_label"].tolist()]
 
+from sklearn.model_selection import train_test_split 
+
+X_train, X_val, y_train, y_val = train_test_split(
+    X_train, 
+    y_train,
+    test_size=0.1,
+    random_state=42,
+    stratify=y_train
+)
+
 X_test = df_test["medical_abstract"].tolist()
 y_test = [label - 1 for label in df_test["condition_label"].tolist()]
 
@@ -85,13 +95,19 @@ y_test = [label - 1 for label in df_test["condition_label"].tolist()]
 train_encodings = tokenizer(
     X_train,    # all medical descriptions
     truncation=True,    # if text lenght is longer than what roberta requires it's cutted
-    max_leght=256
+    max_length=256
+)
+
+val_encodings = tokenizer(
+    X_val,
+    truncation=True,
+    max_length=256
 )
 
 test_encodings = tokenizer(     # same goes here...
     X_test,
     truncation=True,
-    max_lenght=256
+    max_length=256
 )
 
 # creating data collator with padding as hf recommend done at each batch creation 
@@ -142,6 +158,7 @@ print("\n" + "=" * 50)
 
 # asigning with MedicalDataset call
 train_dataset = MedicalDataset(train_encodings, y_train)
+val_dataset = MedicalDataset(val_encodings, y_val)
 test_dataset = MedicalDataset(test_encodings, y_test)
 
 
@@ -226,6 +243,12 @@ train_loader = DataLoader(
     batch_size=8,   # 8 cases each batch
     shuffle=True,   # all the cases are mixed during the training process 
     collate_fn=data_collator # adding data collator
+)
+
+val_loader = DataLoader(
+    val_dataset,
+    batch_size=8,
+    collate_fn=data_collator
 )
 
 test_loader = DataLoader(
@@ -414,6 +437,28 @@ for epoch in range(num_epochs): # add 3 epochs instead on 1
         f"Epoch {epoch + 1} completed "
         f"- Average Loss: {average_epoch_loss:.4f}"
         )
+
+    model.eval()
+
+    val_losses = []
+
+    with torch.no_grad():
+        for batch in val_loader:
+            batch = {
+                key: value.to(device)
+                for key, value in batch.items()
+            }
+
+            outputs = model(**batch)
+            val_losses.append(outputs.loss.item())
+
+    average_val_loss = sum(val_losses) / len(val_losses)
+
+    print(
+        f"Validation loss: {average_val_loss:.4f}"
+    )
+
+    model.train()
     
 
 ############ TRAIN RESULTS ##################

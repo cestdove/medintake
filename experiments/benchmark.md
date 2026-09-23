@@ -305,3 +305,73 @@ Planned directions include:
 - Comparing general-domain and biomedical-domain representations.
 - Exploring retrieval-based approaches and Retrieval-Augmented Generation (RAG).
 - Evaluating retrieval quality separately from generation quality.
+
+---
+
+# Experiment 5 — RoBERTa + Validation Split
+
+## Configuration
+
+- Model: `roberta-base`
+- Epochs: 3
+- Batch size: 8
+- Optimizer: AdamW
+- Learning rate: `2e-5`
+- Maximum sequence length: `256`
+- Validation split: 10%
+- Split strategy: stratified
+- Random state: 42
+- Device: MPS
+- Dynamic padding: enabled
+- Learning-rate scheduler: none
+- Training batches per epoch: 1,300
+- Total training batches: 3,900
+
+## Results
+
+- Average training loss: `0.8763`
+- Validation loss:
+  - Epoch 1: `0.8596`
+  - Epoch 2: `0.8638`
+  - Epoch 3: `0.8423`
+- Test Accuracy: **`61.98%`**
+- Test Macro F1: **`0.62`**
+- Test Weighted F1: **`0.61`**
+
+## Classification Report
+
+| Class | Precision | Recall | F1 | Support |
+|---|---:|---:|---:|---:|
+| 0 | 0.70 | 0.80 | 0.74 | 633 |
+| 1 | 0.56 | 0.51 | 0.54 | 299 |
+| 2 | 0.53 | 0.77 | 0.63 | 385 |
+| 3 | 0.70 | 0.69 | 0.69 | 610 |
+| 4 | 0.56 | 0.44 | 0.49 | 961 |
+
+## Confusion Matrix
+
+| Actual / Predicted | 0 | 1 | 2 | 3 | 4 |
+|---|---:|---:|---:|---:|---:|
+| **0** | 504 | 17 | 52 | 10 | 50 |
+| **1** | 37 | 153 | 8 | 8 | 93 |
+| **2** | 20 | 7 | 295 | 11 | 52 |
+| **3** | 13 | 6 | 43 | 419 | 129 |
+| **4** | 151 | 88 | 155 | 148 | 419 |
+
+## Observation
+
+This experiment introduces a stratified 10% validation split from the original training set while keeping the test set unchanged.
+
+The training loss decreased across all three epochs:
+
+| Epoch | Training Loss | Validation Loss |
+|---|---:|---:|
+| 1 | 1.0185 | 0.8596 |
+| 2 | 0.8404 | 0.8638 |
+| 3 | 0.7699 | **0.8423** |
+
+Validation loss was lowest after the third epoch. The results do not show a clear increase in validation loss across the three epochs.
+
+Because the validation split reduces the amount of data available for training, the resulting test performance should not be treated as a direct replacement for the previous three-epoch RoBERTa experiment.
+
+The experiment establishes a validation-based training setup for subsequent hyperparameter experiments.
