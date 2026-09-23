@@ -434,6 +434,76 @@ This provides an initial indication that the third epoch may introduce some over
 Class 4 remained the most difficult class, with a recall of `0.36` and an F1-score of `0.46`.
 
 The experiment supports continuing hyperparameter development with the `1e-5` learning rate while keeping the remaining configuration fixed.
+
+---
+
+# Experiment 7 — RoBERTa + 2 Epochs
+
+## Configuration
+
+- Model: `roberta-base`
+- Epochs: 2
+- Batch size: 8
+- Optimizer: AdamW
+- Learning rate: `1e-5`
+- Maximum sequence length: `256`
+- Validation split: 10%
+- Split strategy: stratified
+- Random state: 42
+- Device: MPS
+- Dynamic padding: enabled
+- Learning-rate scheduler: none
+- Training batches per epoch: 1,300
+- Total training batches: 2,600
+
+The configuration is identical to Experiment 6 except for the number of training epochs, which was reduced from 3 to 2.
+
+## Results
+
+- Average training loss: `0.9164`
+- Validation loss:
+  - Epoch 1: `0.8556`
+  - Epoch 2: `0.8441`
+- Test Accuracy: **`63.99%`**
+- Test Macro F1: **`0.64`**
+- Test Weighted F1: **`0.63`**
+
+## Classification Report
+
+| Class | Precision | Recall | F1 | Support |
+|---|---:|---:|---:|---:|
+| 0 | 0.66 | 0.91 | 0.76 | 633 |
+| 1 | 0.57 | 0.64 | 0.60 | 299 |
+| 2 | 0.64 | 0.57 | 0.60 | 385 |
+| 3 | 0.69 | 0.76 | 0.72 | 610 |
+| 4 | 0.60 | 0.42 | 0.49 | 961 |
+
+## Confusion Matrix
+
+| Actual / Predicted | 0 | 1 | 2 | 3 | 4 |
+|---|---:|---:|---:|---:|---:|
+| **0** | 575 | 8 | 11 | 9 | 30 |
+| **1** | 51 | 192 | 3 | 2 | 51 |
+| **2** | 41 | 10 | 218 | 27 | 89 |
+| **3** | 18 | 12 | 22 | 463 | 95 |
+| **4** | 189 | 116 | 88 | 168 | 400 |
+
+## Observation
+
+Reducing the number of training epochs from 3 to 2 while keeping the learning rate at `1e-5` improved test performance under the validation-based RoBERTa setup.
+
+| Metric | 3 Epochs | 2 Epochs | Change |
+|---|---:|---:|---:|
+| Accuracy | 62.98% | **63.99%** | +1.01 pp |
+| Macro F1 | 0.63 | **0.64** | +0.01 |
+| Weighted F1 | 0.61 | **0.63** | +0.02 |
+
+Validation loss decreased from `0.8556` after the first epoch to `0.8441` after the second epoch.
+
+Class 4 also showed improved recall compared with the three-epoch configuration, increasing from `0.36` to `0.42`, while its F1-score increased from `0.46` to `0.49`.
+
+The results indicate that, within this validation-based configuration, two epochs with a `1e-5` learning rate provided better test performance than three epochs.
+
 ---
 
 ## Next Experiments

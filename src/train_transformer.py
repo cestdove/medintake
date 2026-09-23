@@ -22,16 +22,17 @@ from datetime import datetime
 
 ##############################
 
-
-
-MODEL_NAME = "roberta-base" # to write faster
-
+# HYPERPARAMETERS SHORTCUT
+# easier to modify 
+MODEL_NAME = "roberta-base" 
+learning_rate = 1e-5
+num_epochs = 2
 
 
 ######### READING THE CSV FILES #########
 
 print("\n" + "=" * 50)
-print("MEDINTAKE — RoBERTa DATASET")
+print("MEDINTAKE")
 print("=" * 50)
 
 # train/test load
@@ -65,7 +66,7 @@ subprocess.run(["clear"])
 ###### TOKENIZATION PHASE #########
 
 print("\n" + "=" * 50)
-print("MEDINTAKE — RoBERTa DATASET")
+print("MEDINTAKE")
 print("=" * 50)
 
 print("\nStarting tokenization process ...\n")
@@ -183,7 +184,7 @@ subprocess.run(["clear"])
 ########### MEDICAL DATASET OVERVIEW ############
 
 print("\n" + "=" * 50)
-print("MEDINTAKE — RoBERTa DATASET")
+print("MEDINTAKE")
 print("=" * 50)
 
 print(f"Training samples : {len(train_dataset)}")
@@ -231,7 +232,7 @@ subprocess.run(["clear"])
 
 ########## DATA LOAD INTO BERT ###########
 print("\n" + "=" * 50)
-print("MEDINTAKE — BERT DATASET")
+print("MEDINTAKE")
 print("=" * 50)
 
 from torch.utils.data import DataLoader
@@ -297,7 +298,7 @@ subprocess.run(["clear"])
 ###### BERT MODEL + CLASSIFIER ######
 
 print("\n" + "=" * 50)
-print("MEDINTAKE — BERT DATASET")
+print("MEDINTAKE")
 print("=" * 50)
 
 print("\nWEIGHTS LOAD ... \n")
@@ -354,25 +355,21 @@ subprocess.run(["clear"])
 
 
 
-
 ######### SET ADAM OPZIMIZER ###########
 
 from torch.optim import AdamW
 
 optimizer = AdamW( # adamW optimizer 
     model.parameters(), # adam modifies BERT and classifier parameters
-    lr=1e-5     # starting learning rate
+    lr=learning_rate     # starting learning rate
 )
-
-# adding lr warmup for better performance
-num_epochs = 3
 
 print("\n" + "=" * 50)
 print("OPTIMIZER")
 print("=" * 50)
 
 print("Optimizer        : AdamW")
-print("Learning rate    : 1e-5")
+print(f"Learning rate    : {learning_rate}")
 
 #########################################
 
@@ -389,7 +386,7 @@ subprocess.run(["clear"])
 
 
 print("\n" + "=" * 50)
-print("TRAINING - 3 EPOCHS")
+print(f"TRAINING - {num_epochs}")
 print("=" * 50)
 
 
@@ -399,7 +396,7 @@ model.train()
 
 losses = []
 
-for epoch in range(num_epochs): # add 3 epochs instead on 1 
+for epoch in range(num_epochs): # add 2 epochs 
     print(f"\nEPOCH {epoch + 1}/{num_epochs}")
 
     epoch_losses = []
