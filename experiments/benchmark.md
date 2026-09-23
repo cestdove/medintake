@@ -295,19 +295,6 @@ Across the completed Transformer experiments, **class 4 consistently represents 
 
 ---
 
-## Next Experiments
-
-Planned directions include:
-
-- Benchmarking more recent Transformer architectures.
-- Evaluating biomedical-domain pretrained language models.
-- Performing deeper Transformer error analysis.
-- Comparing general-domain and biomedical-domain representations.
-- Exploring retrieval-based approaches and Retrieval-Augmented Generation (RAG).
-- Evaluating retrieval quality separately from generation quality.
-
----
-
 # Experiment 5 — RoBERTa + Validation Split
 
 ## Configuration
@@ -375,3 +362,16 @@ Validation loss was lowest after the third epoch. The results do not show a clea
 Because the validation split reduces the amount of data available for training, the resulting test performance should not be treated as a direct replacement for the previous three-epoch RoBERTa experiment.
 
 The experiment establishes a validation-based training setup for subsequent hyperparameter experiments.
+
+## Next Experiments
+
+Planned directions include:
+
+- Benchmarking more recent Transformer architectures.
+- Evaluating biomedical-domain pretrained language models.
+- Performing deeper Transformer error analysis.
+- Comparing general-domain and biomedical-domain representations.
+- Exploring retrieval-based approaches and Retrieval-Augmented Generation (RAG).
+- Evaluating retrieval quality separately from generation quality.
+
+---
