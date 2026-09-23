@@ -49,3 +49,134 @@ The BERT pipeline includes:
 The Transformer implementation is contained in `src/train_transformer.py`.
 
 ### Model Development
+
+The project follows an iterative experimental approach rather than relying on a single model configuration.
+
+The current development path includes:
+
+```text
+TF-IDF + LinearSVC
+       ↓
+BERT fine-tuning
+       ↓
+BERT training optimization
+       ↓
+RoBERTa comparison
+       ↓
+Controlled hyperparameter experiments
+       ↓
+Domain-adaptive pre-training
+```
+
+The initial Transformer benchmark was used to establish baseline performance across different model configurations. Subsequent experiments use a stratified validation split during model development, while the held-out test set is reserved for final evaluation.
+
+Models are compared using accuracy, macro F1, weighted F1, classification reports, and confusion matrices.
+
+## Experiments
+
+Model experiments and benchmark results are documented in the `experiments/` directory.
+
+### Initial Benchmark
+
+The initial benchmark compares the traditional TF-IDF + LinearSVC baseline with several Transformer configurations:
+
+| Model | Epochs | Accuracy | Macro F1 | Weighted F1 |
+|---|---:|---:|---:|---:|
+| TF-IDF + LinearSVC | — | 50.45% | ~0.50 | — |
+| BERT (`bert-base-uncased`) | 1 | 64.37% | 0.64 | 0.62 |
+| BERT (`bert-base-uncased`) | 3 | **65.17%** | **0.65** | **0.63** |
+| BERT + LR scheduler + warmup | 3 | 63.12% | 0.63 | 0.62 |
+| RoBERTa (`roberta-base`) | 3 | 63.61% | 0.63 | 0.61 |
+
+The three-epoch BERT configuration with a constant learning rate of `2e-5` achieved the highest test accuracy among the configurations in this initial benchmark.
+
+The scheduler experiment used dynamic padding, a linear learning-rate scheduler, and 10% warmup.
+
+The RoBERTa experiment completed three epochs and achieved lower test performance than the three-epoch BERT configuration. It also required substantially longer training time on the current MPS hardware.
+
+### Controlled Experiments
+
+A second experimental phase introduces a **10% stratified validation split** from the original training set.
+
+This phase is designed to evaluate training configurations under a consistent protocol, varying one factor at a time where possible. The held-out test set remains untouched during training and validation.
+
+| Model | Learning Rate | Epochs | Accuracy | Macro F1 | Weighted F1 |
+|---|---:|---:|---:|---:|---:|
+| RoBERTa (`roberta-base`) | 2e-5 | 3 | 61.98% | 0.62 | 0.61 |
+| RoBERTa (`roberta-base`) | 1e-5 | 3 | 62.98% | 0.63 | 0.61 |
+| RoBERTa (`roberta-base`) | 1e-5 | 2 | 63.99% | 0.64 | 0.63 |
+| BERT (`bert-base-uncased`) | 1e-5 | 2 | **64.34%** | **0.64** | **0.63** |
+
+The BERT and RoBERTa two-epoch experiments use the same validation-based training protocol, allowing a controlled comparison between the two architectures. Under this protocol, BERT achieved 64.34% test accuracy, compared with 63.99% for RoBERTa.
+
+Validation losses are also recorded for each experiment to monitor training behavior and potential overfitting.
+
+Detailed results, training losses, validation losses, and confusion matrices are documented in [`experiments/benchmark.md`](experiments/benchmark.md).
+
+Further experiments will focus on more recent Transformer architectures and biomedical-domain pretrained models.
+
+## Project Structure
+
+```text
+medintake/
+├── datasets/
+├── models/
+├── notebooks/
+├── src/
+│   ├── download_dataset.py
+│   ├── train_model.py
+│   ├── train_transformer.py
+│   └── evaluate_transformer.py
+├── experiments/
+│   └── benchmark.md
+├── README.md
+├── requirements.txt
+└── LICENSE
+```
+
+## Setup
+
+```bash
+git clone https://github.com/cestdove/medintake.git
+cd medintake
+
+pip install -r requirements.txt
+```
+
+To download and prepare the dataset:
+
+```bash
+python src/download_dataset.py
+```
+
+To train the baseline model:
+
+```bash
+python src/train_model.py
+```
+
+The trained model and TF-IDF vectorizer are saved in the `models/` directory.
+
+To train the Transformer-based model:
+
+```bash
+python src/train_transformer.py
+```
+
+The Transformer model is fine-tuned using the prepared clinical abstract dataset.
+
+To evaluate a saved Transformer model without retraining:
+
+```bash
+python src/evaluate_transformer.py
+```
+
+The evaluation script loads a saved Transformer model from the `models/` directory and evaluates it on the test set, reporting accuracy, classification metrics, and the confusion matrix.
+
+## Notebooks
+
+The `notebooks/` directory contains exploratory analysis and model evaluation notebooks, including error analysis and model interpretability.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
