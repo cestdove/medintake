@@ -63,16 +63,22 @@ BERT training optimization
        ↓
 RoBERTa comparison
        ↓
+Controlled hyperparameter experiments
+       ↓
 Domain-adaptive pre-training
 ```
 
-Experiments use a stratified validation split during model development, while the held-out test set is reserved for final evaluation. Models are compared using accuracy, macro F1, weighted F1, classification reports, and confusion matrices.
+The initial Transformer benchmark was used to establish baseline performance across different model configurations. Subsequent experiments use a stratified validation split during model development, while the held-out test set is reserved for final evaluation.
+
+Models are compared using accuracy, macro F1, weighted F1, classification reports, and confusion matrices.
 
 ## Experiments
 
 Model experiments and benchmark results are documented in the `experiments/` directory.
 
-The current benchmark compares the traditional TF-IDF + LinearSVC baseline with several Transformer configurations:
+### Initial Benchmark
+
+The initial benchmark compares the traditional TF-IDF + LinearSVC baseline with several Transformer configurations:
 
 | Model | Epochs | Accuracy | Macro F1 | Weighted F1 |
 |---|---:|---:|---:|---:|
@@ -82,15 +88,28 @@ The current benchmark compares the traditional TF-IDF + LinearSVC baseline with 
 | BERT + LR scheduler + warmup | 3 | 63.12% | 0.63 | 0.62 |
 | RoBERTa (`roberta-base`) | 3 | 63.61% | 0.63 | 0.61 |
 
-The three-epoch BERT configuration with a constant learning rate of `2e-5` currently provides the highest test accuracy among the configurations evaluated.
+The three-epoch BERT configuration with a constant learning rate of `2e-5` achieved the highest test accuracy among the configurations in this initial benchmark.
 
-The scheduler experiment used dynamic padding, a linear learning-rate scheduler, and 10% warmup. It did not improve performance over the constant-learning-rate configuration.
+The scheduler experiment used dynamic padding, a linear learning-rate scheduler, and 10% warmup.
 
-The RoBERTa experiment completed three epochs but achieved lower test performance than the three-epoch BERT configuration. It also required substantially longer training time on the current MPS hardware.
+The RoBERTa experiment completed three epochs and achieved lower test performance than the three-epoch BERT configuration. It also required substantially longer training time on the current MPS hardware.
+
+### Controlled Experiments
+
+A second experimental phase introduces a **10% stratified validation split** from the original training set.
+
+This phase is designed to evaluate training configurations under a consistent protocol, varying one factor at a time where possible. The held-out test set remains untouched during training and validation.
+
+Current controlled experiments include:
+
+- RoBERTa with different learning rates
+- RoBERTa with different numbers of training epochs
+- BERT under the same validation-based protocol
+- Comparison of BERT and RoBERTa under matched training configurations
+
+Detailed results, training losses, validation losses, and confusion matrices are documented in [`experiments/benchmark.md`](experiments/benchmark.md).
 
 Further experiments will focus on more recent Transformer architectures and biomedical-domain pretrained models.
-
-See [`experiments/benchmark.md`](experiments/benchmark.md) for the detailed results.
 
 ## Project Structure
 
@@ -148,7 +167,7 @@ To evaluate a saved Transformer model without retraining:
 python src/evaluate_transformer.py
 ```
 
-The evaluation script loads the saved Transformer model from `models/bert-medintake/` and evaluates it on the test set, reporting accuracy, classification metrics, and the confusion matrix.
+The evaluation script loads a saved Transformer model from the `models/` directory and evaluates it on the test set, reporting accuracy, classification metrics, and the confusion matrix.
 
 ## Notebooks
 
