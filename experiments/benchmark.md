@@ -734,6 +734,86 @@ The configuration improved over Experiment 9 but remained below the historical b
 
 ---
 
+# Experiment 11 — BERT + 2e-5 + 3 Epochs
+
+## Configuration
+
+- Model: `bert-base-uncased`
+- Epochs: 3
+- Batch size: 8
+- Optimizer: AdamW
+- Learning rate: `2e-5`
+- Maximum sequence length: `256`
+- Validation split: 10%
+- Split strategy: stratified
+- Random state: 42
+- Device: MPS
+- Dynamic padding: enabled
+- Learning-rate scheduler: none
+- Training batches per epoch: 1,300
+- Total training batches: 3,900
+
+The configuration follows the same validation-based training protocol used in Experiments 8–10. Compared with Experiment 10, the learning rate remains at `2e-5`, while the number of training epochs is increased from 2 to 3.
+
+## Results
+
+- Average training loss: `0.8400`
+- Validation loss:
+  - Epoch 1: `0.8658`
+  - Epoch 2: `0.8392`
+  - Epoch 3: `0.8806`
+- Test Accuracy: **`62.47%`**
+- Test Macro F1: **`0.62`**
+- Test Weighted F1: **`0.61`**
+
+## Classification Report
+
+| Class | Precision | Recall | F1 | Support |
+|---|---:|---:|---:|---:|
+| 0 | 0.66 | 0.83 | 0.74 | 633 |
+| 1 | 0.56 | 0.58 | 0.57 | 299 |
+| 2 | 0.60 | 0.52 | 0.55 | 385 |
+| 3 | 0.65 | 0.82 | 0.73 | 610 |
+| 4 | 0.60 | 0.42 | 0.49 | 961 |
+
+## Confusion Matrix
+
+| Actual / Predicted | 0 | 1 | 2 | 3 | 4 |
+|---|---:|---:|---:|---:|---:|
+| **0** | 526 | 18 | 33 | 15 | 41 |
+| **1** | 42 | 172 | 3 | 7 | 75 |
+| **2** | 34 | 14 | 200 | 38 | 99 |
+| **3** | 20 | 9 | 22 | 503 | 56 |
+| **4** | 170 | 96 | 78 | 214 | 403 |
+
+## Observation
+
+BERT achieved **62.47% test accuracy**, with a Macro F1 of **0.62** and Weighted F1 of **0.61** under the validation-based training protocol.
+
+Training loss continued to decrease across all three epochs:
+
+- Epoch 1: `1.0039`
+- Epoch 2: `0.8064`
+- Epoch 3: `0.7097`
+
+Validation loss decreased from `0.8658` after the first epoch to `0.8392` after the second epoch, but increased to `0.8806` after the third epoch.
+
+Compared with Experiment 10, which used the same learning rate and validation protocol but trained for only two epochs:
+
+| Metric | 2 Epochs | 3 Epochs | Difference |
+|---|---:|---:|---:|
+| Accuracy | **64.58%** | 62.47% | **-2.11 pp** |
+| Macro F1 | **0.64** | 0.62 | -0.02 |
+| Weighted F1 | **0.62** | 0.61 | -0.01 |
+
+The additional epoch therefore reduced test performance. The validation loss reached its minimum after the second epoch and increased substantially during the third epoch while training loss continued to decrease, providing a clearer indication of overfitting than in the previous experiments.
+
+Class 4 remained one of the main sources of errors, with a recall of `0.42` and an F1-score of `0.49`.
+
+The results indicate that, under the current validation-based configuration, two epochs with a `2e-5` learning rate performed better than three epochs.
+
+---
+
 ## Next Experiments
 
 Planned directions include:

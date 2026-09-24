@@ -27,7 +27,7 @@ from datetime import datetime
 model_str = "bert-base-uncased" # text for strings
 MODEL_NAME = model_str # for execution model naming
 learning_rate = 2e-5
-num_epochs = 2
+num_epochs = 3
 
 
 ######### READING THE CSV FILES #########

@@ -108,18 +108,21 @@ This phase is designed to evaluate training configurations under a consistent pr
 | BERT (`bert-base-uncased`) | 1e-5 | 2 | 64.34% | 0.64 | 0.63 |
 | BERT (`bert-base-uncased`) | 1e-5 | 3 | 61.39% | 0.61 | 0.61 |
 | BERT (`bert-base-uncased`) | 2e-5 | 2 | **64.58%** | 0.64 | 0.62 |
+| BERT (`bert-base-uncased`) | 2e-5 | 3 | 62.47% | 0.62 | 0.61 |
 
-Under the validation-based protocol, BERT with a learning rate of `2e-5` and two training epochs achieved the highest test accuracy so far, reaching **64.58%**.
+Under the validation-based protocol, BERT with a learning rate of `2e-5` and two training epochs achieved the highest test accuracy, reaching **64.58%**.
 
 The comparison between Experiments 8 and 10 shows that increasing the learning rate from `1e-5` to `2e-5` while keeping two training epochs improved test accuracy from 64.34% to 64.58%.
 
-Increasing the number of epochs at `1e-5` did not improve performance. The three-epoch configuration achieved 61.39%, compared with 64.34% after two epochs.
+Increasing the number of epochs did not improve performance in the tested configurations. At a learning rate of `2e-5`, increasing training from two to three epochs reduced test accuracy from 64.58% to 62.47%.
 
-Validation losses are also recorded for each experiment to monitor training behavior and potential overfitting.
+The three-epoch `2e-5` configuration also showed a validation-loss increase after the second epoch, while training loss continued to decrease, providing evidence of overfitting.
+
+Validation losses are recorded for each experiment to monitor training behavior and potential overfitting.
 
 Detailed results, training losses, validation losses, and confusion matrices are documented in [`experiments/benchmark.md`](experiments/benchmark.md).
 
-Further experiments will focus on testing the `2e-5` learning rate for three epochs under the same validation-based protocol, followed by more recent Transformer architectures and biomedical-domain pretrained models.
+Further experiments will focus on more recent Transformer architectures, biomedical-domain pretrained models, and deeper Transformer error analysis.
 
 ## Project Structure
 
