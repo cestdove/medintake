@@ -24,10 +24,11 @@ from datetime import datetime
 
 # HYPERPARAMETERS SHORTCUT
 # easier to modify 
-model_str = "bert-base-uncased" # text for strings
+model_str = "microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext" # text for strings
 MODEL_NAME = model_str # for execution model naming
 learning_rate = 2e-5
-num_epochs = 3
+num_epochs = 2
+output_dir = ("models/biomedbert-medintake")
 
 
 ######### READING THE CSV FILES #########
@@ -474,8 +475,8 @@ print(f"Batches              : {len(losses)}")
 
 ######### SAVE MODEL ####################
 
-model.save_pretrained("models/bert-medintake-val")
-tokenizer.save_pretrained("models/bert-medintake-val")
+model.save_pretrained(output_dir)
+tokenizer.save_pretrained(output_dir)
 
 ############## EVALUATION ##################
 

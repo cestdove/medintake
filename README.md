@@ -65,7 +65,7 @@ RoBERTa comparison
        ↓
 Controlled hyperparameter experiments
        ↓
-Domain-adaptive pre-training
+Biomedical-domain pretraining
 ```
 
 The initial Transformer benchmark was used to establish baseline performance across different model configurations. Subsequent experiments use a stratified validation split during model development, while the held-out test set is reserved for final evaluation.
@@ -107,22 +107,25 @@ This phase is designed to evaluate training configurations under a consistent pr
 | RoBERTa (`roberta-base`) | 1e-5 | 2 | 63.99% | 0.64 | 0.63 |
 | BERT (`bert-base-uncased`) | 1e-5 | 2 | 64.34% | 0.64 | 0.63 |
 | BERT (`bert-base-uncased`) | 1e-5 | 3 | 61.39% | 0.61 | 0.61 |
-| BERT (`bert-base-uncased`) | 2e-5 | 2 | **64.58%** | 0.64 | 0.62 |
+| BERT (`bert-base-uncased`) | 2e-5 | 2 | 64.58% | 0.64 | 0.62 |
 | BERT (`bert-base-uncased`) | 2e-5 | 3 | 62.47% | 0.62 | 0.61 |
+| **BiomedBERT** (`microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext`) | 2e-5 | 2 | **65.37%** | **0.65** | **0.64** |
 
-Under the validation-based protocol, BERT with a learning rate of `2e-5` and two training epochs achieved the highest test accuracy, reaching **64.58%**.
+Under the validation-based protocol, **BiomedBERT with a learning rate of `2e-5` and two training epochs achieved the highest test accuracy**, reaching **65.37%**.
 
-The comparison between Experiments 8 and 10 shows that increasing the learning rate from `1e-5` to `2e-5` while keeping two training epochs improved test accuracy from 64.34% to 64.58%.
+Compared with the matched BERT configuration from Experiment 10, BiomedBERT improved test accuracy by **0.79 percentage points**, while also improving Macro F1 from 0.64 to 0.65 and Weighted F1 from 0.62 to 0.64.
 
-Increasing the number of epochs did not improve performance in the tested configurations. At a learning rate of `2e-5`, increasing training from two to three epochs reduced test accuracy from 64.58% to 62.47%.
+Validation loss for BiomedBERT decreased from `0.8233` after the first epoch to `0.7671` after the second epoch, while training loss also continued to decrease.
 
-The three-epoch `2e-5` configuration also showed a validation-loss increase after the second epoch, while training loss continued to decrease, providing evidence of overfitting.
+The result provides initial evidence that biomedical-domain pretraining can improve performance on this medical abstract classification task.
+
+Class 4 remains the most difficult class across the Transformer experiments, particularly in terms of recall.
 
 Validation losses are recorded for each experiment to monitor training behavior and potential overfitting.
 
 Detailed results, training losses, validation losses, and confusion matrices are documented in [`experiments/benchmark.md`](experiments/benchmark.md).
 
-Further experiments will focus on more recent Transformer architectures, biomedical-domain pretrained models, and deeper Transformer error analysis.
+Further experiments will focus on comparing additional biomedical-domain pretrained models, deeper Transformer error analysis, and more recent Transformer architectures.
 
 ## Project Structure
 
