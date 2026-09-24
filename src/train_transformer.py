@@ -26,7 +26,7 @@ from datetime import datetime
 # easier to modify 
 model_str = "bert-base-uncased" # text for strings
 MODEL_NAME = model_str # for execution model naming
-learning_rate = 1e-5
+learning_rate = 2e-5
 num_epochs = 2
 
 
@@ -188,7 +188,7 @@ print("\n" + "=" * 50)
 print("MEDINTAKE")
 print("=" * 50)
 
-print(f"Training samples : {len(train_dataset)}")
+print(f"\nTraining samples : {len(train_dataset)}")
 print(f"Test samples     : {len(test_dataset)}")
 print("Labels           : 5")
 print(f"Model            : {model_str}")
@@ -369,7 +369,7 @@ print("\n" + "=" * 50)
 print("OPTIMIZER")
 print("=" * 50)
 
-print("Optimizer        : AdamW")
+print("\nOptimizer        : AdamW")
 print(f"Learning rate    : {learning_rate}")
 
 #########################################
@@ -387,7 +387,7 @@ subprocess.run(["clear"])
 
 
 print("\n" + "=" * 50)
-print(f"TRAINING - {num_epochs}")
+print(f"TRAINING - {num_epochs} EPOCHS")
 print("=" * 50)
 
 
@@ -400,7 +400,7 @@ losses = []
 for epoch in range(num_epochs): # add 2 epochs 
     print(f"\nEPOCH {epoch + 1}/{num_epochs}")
 
-    print(f"\nEpoch {epoch + 1}/{num_epochs} started at {datetime.now().strftime('%H:%M:%S')}")
+    print(f"(started at {datetime.now().strftime('%H:%M:%S')})")
 
     epoch_losses = []
 

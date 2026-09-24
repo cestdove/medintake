@@ -659,6 +659,81 @@ The results indicate that increasing training from 2 to 3 epochs at a learning r
 
 ---
 
+# Experiment 10 — BERT + 2e-5 + 2 Epochs
+
+## Configuration
+
+- Model: `bert-base-uncased`
+- Epochs: 2
+- Batch size: 8
+- Optimizer: AdamW
+- Learning rate: `2e-5`
+- Maximum sequence length: `256`
+- Validation split: 10%
+- Split strategy: stratified
+- Random state: 42
+- Device: MPS
+- Dynamic padding: enabled
+- Learning-rate scheduler: none
+- Training batches per epoch: 1,300
+- Total training batches: 2,600
+
+The configuration follows the same validation-based training protocol used in Experiments 8 and 9. Compared with Experiment 9, the learning rate is increased from `1e-5` to `2e-5`, while the number of epochs is reduced from 3 to 2.
+
+## Results
+
+- Average training loss: `0.9233`
+- Validation loss:
+  - Epoch 1: `0.8954`
+  - Epoch 2: `0.8506`
+- Test Accuracy: **`64.58%`**
+- Test Macro F1: **`0.64`**
+- Test Weighted F1: **`0.62`**
+
+## Classification Report
+
+| Class | Precision | Recall | F1 | Support |
+|---|---:|---:|---:|---:|
+| 0 | 0.68 | 0.87 | 0.76 | 633 |
+| 1 | 0.55 | 0.73 | 0.62 | 299 |
+| 2 | 0.57 | 0.74 | 0.65 | 385 |
+| 3 | 0.67 | 0.83 | 0.74 | 610 |
+| 4 | 0.72 | 0.32 | 0.44 | 961 |
+
+## Confusion Matrix
+
+| Actual / Predicted | 0 | 1 | 2 | 3 | 4 |
+|---|---:|---:|---:|---:|---:|
+| **0** | 550 | 16 | 25 | 12 | 30 |
+| **1** | 43 | 217 | 7 | 5 | 27 |
+| **2** | 34 | 7 | 286 | 28 | 30 |
+| **3** | 17 | 18 | 33 | 509 | 33 |
+| **4** | 163 | 138 | 148 | 209 | 303 |
+
+## Observation
+
+BERT achieved **64.58% test accuracy**, with a Macro F1 of **0.64** and Weighted F1 of **0.62** under the validation-based training protocol.
+
+Training loss decreased from `1.0219` after the first epoch to `0.8247` after the second epoch. Validation loss also decreased from `0.8954` to `0.8506`.
+
+Compared with Experiment 9, which used the same validation protocol but a learning rate of `1e-5` and three epochs:
+
+| Metric | Experiment 9 | Experiment 10 | Difference |
+|---|---:|---:|---:|
+| Accuracy | 61.39% | **64.58%** | **+3.19 pp** |
+| Macro F1 | 0.61 | **0.64** | +0.03 |
+| Weighted F1 | 0.61 | **0.62** | +0.01 |
+
+The higher learning rate combined with two epochs substantially improved test accuracy compared with the `1e-5` three-epoch configuration.
+
+Validation loss reached its lowest value after the second epoch, with no increase across the two training epochs.
+
+Class 4 remained the most difficult class in terms of recall, with a recall of `0.32` and an F1-score of `0.44`. However, its precision increased to `0.72`, indicating that the model made relatively few incorrect predictions of class 4 while missing a substantial portion of its actual examples.
+
+The configuration improved over Experiment 9 but remained below the historical benchmark of `65.17%`.
+
+---
+
 ## Next Experiments
 
 Planned directions include:
