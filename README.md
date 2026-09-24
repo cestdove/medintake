@@ -94,7 +94,7 @@ The scheduler experiment used dynamic padding, a linear learning-rate scheduler,
 
 The RoBERTa experiment completed three epochs and achieved lower test performance than the three-epoch BERT configuration. It also required substantially longer training time on the current MPS hardware.
 
-### Controlled Experiments**
+### Controlled Experiments
 
 A second experimental phase introduces a **10% stratified validation split** from the original training set.
 
