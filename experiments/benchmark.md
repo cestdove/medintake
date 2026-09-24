@@ -579,6 +579,86 @@ The results provide a controlled comparison between BERT and RoBERTa under the s
 
 ---
 
+# Experiment 9 — BERT + 1e-5 + 3 Epochs
+
+## Configuration
+
+- Model: `bert-base-uncased`
+- Epochs: 3
+- Batch size: 8
+- Optimizer: AdamW
+- Learning rate: `1e-5`
+- Maximum sequence length: `256`
+- Validation split: 10%
+- Split strategy: stratified
+- Random state: 42
+- Device: MPS
+- Dynamic padding: enabled
+- Learning-rate scheduler: none
+- Training batches per epoch: 1,300
+- Total training batches: 3,900
+
+The configuration follows the same validation-based training protocol used in Experiments 5–8. Compared with Experiment 8, the learning rate remains at `1e-5`, while the number of training epochs is increased from 2 to 3.
+
+## Results
+
+- Average training loss: `0.8645`
+- Validation loss:
+  - Epoch 1: `0.8996`
+  - Epoch 2: `0.8681`
+  - Epoch 3: `0.8705`
+- Test Accuracy: **`61.39%`**
+- Test Macro F1: **`0.61`**
+- Test Weighted F1: **`0.61`**
+
+## Classification Report
+
+| Class | Precision | Recall | F1 | Support |
+|---|---:|---:|---:|---:|
+| 0 | 0.67 | 0.80 | 0.73 | 633 |
+| 1 | 0.54 | 0.58 | 0.56 | 299 |
+| 2 | 0.65 | 0.49 | 0.56 | 385 |
+| 3 | 0.67 | 0.68 | 0.68 | 610 |
+| 4 | 0.54 | 0.51 | 0.53 | 961 |
+
+## Confusion Matrix
+
+| Actual / Predicted | 0 | 1 | 2 | 3 | 4 |
+|---|---:|---:|---:|---:|---:|
+| **0** | 507 | 18 | 20 | 16 | 72 |
+| **1** | 42 | 173 | 2 | 8 | 74 |
+| **2** | 40 | 11 | 187 | 38 | 109 |
+| **3** | 17 | 9 | 10 | 416 | 158 |
+| **4** | 154 | 109 | 68 | 140 | 490 |
+
+## Observation
+
+BERT achieved **61.39% test accuracy**, with a Macro F1 of **0.61** and Weighted F1 of **0.61**.
+
+Training loss continued to decrease across all three epochs:
+
+- Epoch 1: `1.0403`
+- Epoch 2: `0.8193`
+- Epoch 3: `0.7340`
+
+Validation loss decreased from `0.8996` to `0.8681` after the second epoch, but slightly increased to `0.8705` after the third epoch.
+
+Compared with Experiment 8, which used the same learning rate and validation protocol but trained for only two epochs:
+
+| Metric | 2 Epochs | 3 Epochs | Difference |
+|---|---:|---:|---:|
+| Accuracy | **64.34%** | 61.39% | **-2.95 pp** |
+| Macro F1 | **0.64** | 0.61 | -0.03 |
+| Weighted F1 | **0.63** | 0.61 | -0.02 |
+
+The additional epoch therefore did not improve performance. The best validation loss was also reached after the second epoch, suggesting that extending training to three epochs was not beneficial for this configuration.
+
+Class 4 remained difficult, although its recall increased from `0.38` in Experiment 8 to `0.51` in this experiment. This improvement did not translate into higher overall performance, as performance on other classes decreased.
+
+The results indicate that increasing training from 2 to 3 epochs at a learning rate of `1e-5` is not an effective direction under the current configuration.
+
+---
+
 ## Next Experiments
 
 Planned directions include:
