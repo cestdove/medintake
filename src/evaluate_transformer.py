@@ -4,16 +4,27 @@ import torch
 
 # useful import
 from torch.utils.data import Dataset, DataLoader
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import (
+    AutoTokenizer, 
+    AutoModelForSequenceClassification,
+    DataCollatorWithPadding 
+    )
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
 # for a better ui 
-import time
 import subprocess
 import readchar 
 
 
 
+##############################
+
+# HYPERPARAMETERS SHORTCUT
+# easier to modify 
+model_str = "models/biomedbert-medintake" # text for strings
+MODEL_NAME = model_str # for execution model naming
+
+##############################
 
 
 ############ CSV AND MODELS LOAD ##############
@@ -25,11 +36,11 @@ print("=" * 50)
 df_test = pd.read_csv("datasets/clinical_cases_test.csv")
 
 tokenizer = AutoTokenizer.from_pretrained( # tokenizer from our model 
-    "models/bert-medintake"
+    MODEL_NAME
 )
 
 model = AutoModelForSequenceClassification.from_pretrained( # model from our model :D
-    "models/bert-medintake"
+    MODEL_NAME
 )
 
 device = torch.device( # if possible mps as device else cpu 
@@ -50,7 +61,7 @@ y_test = [  # defining df target
 test_encodings = tokenizer( # defining encodings to be created by tokenizer 
     X_test,
     truncation=True,
-    padding=True
+    max_length=256
 )
 
 
@@ -77,10 +88,15 @@ class MedicalDataset(Dataset):
 
 test_dataset = MedicalDataset(test_encodings, y_test) # setting dataset by passing data to class
 
+data_collator = DataCollatorWithPadding(
+    tokenizer=tokenizer
+)
+
 # dataloader definition to pass it for training to the model 
 test_loader = DataLoader(
     test_dataset, # use test dataset defined by class before 
-    batch_size=8 # use 8 abstracts as batch size each forward-backward pass
+    batch_size=8, # use 8 abstracts as batch size each forward-backward pass
+    collate_fn=data_collator
 )
 
 ###################################################
