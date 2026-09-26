@@ -19,7 +19,7 @@ import readchar
 ############ CSV AND MODELS LOAD ##############
 
 print("\n" + "=" * 50)
-print("BERT MEDINTAKE — DATA CHECK")
+print("MEDINTAKE")
 print("=" * 50)
 
 df_test = pd.read_csv("datasets/clinical_cases_test.csv")
@@ -113,7 +113,7 @@ subprocess.run(["clear"])
 ############### MODEL EVALUATION #############
 
 print("\n" + "=" * 50)
-print("BERT MEDINTAKE — EVALUATION")
+print("MEDINTAKE — EVALUATION")
 print("=" * 50)
 
 model.eval() # put model in eval mode
